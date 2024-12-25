@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: init-db
+      author: uolimov
+      changes:
+        - sqlFile:
+            path: db/changelog/release/2024-12-25-init-db.sql
+#        - rollback:
+#            path: ./changelog/rollback/
