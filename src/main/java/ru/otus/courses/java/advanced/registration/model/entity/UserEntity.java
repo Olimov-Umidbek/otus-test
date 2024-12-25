@@ -6,19 +6,18 @@ import org.hibernate.annotations.UpdateTimestamp;
 import ru.otus.courses.java.advanced.registration.model.enums.UserRole;
 
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
-@Entity(name = "users")
+@Entity
 @Table(name = "users")
-public record UserEntity(
+public record UserEntity (
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id,
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id,
 
     @Column(nullable = false, unique = true, length = 60)
     String username,
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", nullable = false)
     String password,
 
     @Column(name = "role", nullable = false)

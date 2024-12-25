@@ -10,7 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.courses.java.advanced.registration.mapper.UserInfoMapper;
 import ru.otus.courses.java.advanced.registration.model.dto.UserInfoDto;
-import ru.otus.courses.java.advanced.registration.model.dto.UserRegistrationDto;
+import ru.otus.courses.java.advanced.registration.model.domain.UserRegistration;
 import ru.otus.courses.java.advanced.registration.model.entity.UserEntity;
 import ru.otus.courses.java.advanced.registration.model.enums.UserRole;
 import ru.otus.courses.java.advanced.registration.repository.UserInfoRepository;
@@ -18,7 +18,6 @@ import ru.otus.courses.java.advanced.registration.service.UserInfoService;
 
 import java.security.Principal;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -37,12 +36,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public Mono<UserInfoDto> createUser(UserRegistrationDto userRegistrationDto) {
+    public Mono<UserInfoDto> createUser(UserRegistration userRegistration) {
         try {
             UserEntity userEntity = new UserEntity(
-                UUID.randomUUID(),
-                userRegistrationDto.getUsername(),
-                passwordEncoder.encode(userRegistrationDto.getPassword()),
+                null,
+                userRegistration.username(),
+                passwordEncoder.encode(userRegistration.password()),
                 UserRole.USER,
                 "test@test.com",
                 ZonedDateTime.now(),

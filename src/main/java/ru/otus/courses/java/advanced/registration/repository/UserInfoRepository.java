@@ -12,6 +12,9 @@ import java.util.UUID;
 @Repository
 public interface UserInfoRepository extends R2dbcRepository<UserEntity, UUID> {
 
+    @Query("SELECT * FROM users")
+    Flux<UserEntity> findAll();
+
     @Query("SELECT * FROM users where username = :username")
     Mono<UserEntity> findByUsername(String username);
 

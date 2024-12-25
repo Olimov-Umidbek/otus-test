@@ -10,6 +10,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import ru.otus.courses.java.advanced.registration.model.enums.UserRole;
 import ru.otus.courses.java.advanced.registration.security.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -22,13 +23,20 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchange ->
-                    exchange
-                        .pathMatchers("/login").permitAll()
-                        .anyExchange()
-                        .authenticated()
-                )
-                .build();
+            .authorizeExchange(exchange ->
+                exchange
+                    .pathMatchers("/users/**").hasAnyRole(UserRole.ADMIN.name())
+                    .pathMatchers("/login").permitAll()
+                    .anyExchange()
+                    .authenticated()
+            )
+            .formLogin(spec ->
+                spec.authenticationManager(authenticationManager())
+            )
+            .httpBasic(httpBasicSpec ->
+                httpBasicSpec.authenticationManager(authenticationManager())
+            )
+            .build();
     }
 
     @Bean

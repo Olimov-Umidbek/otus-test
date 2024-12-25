@@ -10,9 +10,7 @@ import reactor.core.publisher.Mono;
 import ru.otus.courses.java.advanced.registration.mapper.UserInfoMapper;
 import ru.otus.courses.java.advanced.registration.repository.UserInfoRepository;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
 
 @Service
 @Slf4j
@@ -21,25 +19,21 @@ public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
     private final UserInfoMapper mapper;
     private final UserInfoRepository userInfoRepository;
 
-    private final Map<String, UserDetails> userDetailsCache = new WeakHashMap<>();
-
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        if (userDetailsCache.containsKey(username)) {
-            return Mono.just(userDetailsCache.get(username));
-        }
 
-        userInfoRepository.findByUsername(username)
+        return userInfoRepository.findByUsername(username)
             .filter(Objects::nonNull)
+            .log()
             .map(mapper::toDetails)
-            .subscribe(
-                (userInfo) -> userDetailsCache.put(username, userInfo),
-                (e) -> {
+            .doOnError(e -> {
                     log.error("Happened an error, message" +  e.getMessage(), e);
                     throw new UsernameNotFoundException(username);
                 }
-            );
-
-        return Mono.just(userDetailsCache.get(username));
+            )
+            .switchIfEmpty(Mono.defer(() -> {
+                log.error("User not found: " + username);
+                return Mono.error(new UsernameNotFoundException(username));
+            }));
     }
 }
